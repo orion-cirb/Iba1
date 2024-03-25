@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+        
+    <parent>
+        <groupId>org.scijava</groupId>
+        <artifactId>pom-scijava</artifactId>
+        <version>37.0.0</version>
+        <relativePath />
+    </parent>
+        
+    <groupId>fr.cirb.orion</groupId>
+    <artifactId>Iba1</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+    
+    <name>Iba1</name>
+    <description>
+        Perform maximum intensity z-projection
+        Detect microglial cells soma with Cellpose and give their number
+        Segment microglial cells with thresholding ang give their area and integrated intensity
+    </description>
+    <url>https://github.com/orion-cirb/Iba1</url>
+    <inceptionYear>2024</inceptionYear>
+    <organization>
+        <name>orion-cirb</name>
+        <url>http://orion-cirb.fr/</url>
+    </organization>
+    <licenses>
+        <license>
+            <name>None</name>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>hm</id>
+            <name>Héloïse Monnet</name>
+            <email>heloise.monnet@college-de-france.fr</email>
+            <organization>CIRB, Collège de France</organization>
+            <roles>
+                    <role>developer</role>
+            </roles>
+      </developer>
+    </developers>
+    
+    <contributors>
+        <contributor>
+            <name>None</name>
+      </contributor>
+    </contributors>
+    
+    <mailingLists>
+        <mailingList>
+            <name>None</name>
+        </mailingList>
+    </mailingLists>
+    
+    <scm>
+        <url>https://github.com/orion-cirb/Iba1</url> 
+    </scm>
+    <issueManagement>
+        <system>GitHub Issues</system>
+        <url>https://github.com/orion-cirb/Iba1</url>
+    </issueManagement>
+    <ciManagement>
+        <system>None</system>
+    </ciManagement>
+    
+    <properties>
+        <imagej.app.directory>/opt/Fiji.app/</imagej.app.directory>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <license.licenseName>None</license.licenseName>
+        <license.copyrightOwners>None</license.copyrightOwners>
+    </properties>
+
+    <repositories>
+        <repository>
+            <id>scijava.public</id>
+            <url>https://maven.scijava.org/content/groups/public</url>
+        </repository>
+    </repositories>
+
+    <dependencies>
+        <!-- ImageJ -->
+        <dependency>
+            <groupId>net.imagej</groupId>
+            <artifactId>imagej</artifactId>
+            <version>2.15.0</version>
+            <type>jar</type>
+        </dependency>
+        <!-- Fiji -->
+        <dependency>
+            <groupId>sc.fiji</groupId>
+            <artifactId>fiji-lib</artifactId>
+        </dependency>
+        <!-- 3D Image Suite -->
+        <dependency>
+            <groupId>mcib</groupId>
+            <artifactId>mcib3d-core</artifactId>
+            <version>4.0.93</version>
+         </dependency>
+        <!-- CLIJ2 -->
+        <dependency>
+            <groupId>net.haesleinhuepf</groupId>
+            <artifactId>clij2_</artifactId>
+            <version>2.5.3.1</version>
+        </dependency>
+    </dependencies>
+    
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copytoplugins</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <copy todir="${imagej.app.directory}/plugins/CIRB" file="target/${project.build.finalName}.jar"/>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
