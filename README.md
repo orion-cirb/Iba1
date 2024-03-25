@@ -7,7 +7,7 @@
 
 ### Images description
 
-3D images taken with a x40 objective on  a spinning_disk microscope
+3D images taken with a x40 objective on  a spinning-disk microscope
 
 * 1 channel: Iba1 microglia
 
