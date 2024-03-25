@@ -9,7 +9,7 @@
 
 3D images taken with a x40 objective on  a spinning-disk microscope
 
-* 1 channel: Iba1 microglia
+1 channel: Iba1 microglia
 
 With each image can be provided a *.roi* or *.zip* file containing one or multiple ROI(s).
 
