@@ -519,14 +519,17 @@ public class Tools {
         imhCell.closeImagePlus();
     }
     
-
+    /**
+     * Draw label of each object in population
+     */
     public void drawLabels(Objects3DIntPopulation pop, ImagePlus img) {
-        Font font = new Font("Monospace", Font.PLAIN, 14);
+        Font font = new Font("SansSerif", Font.PLAIN, 12);
         for (Object3DInt obj: pop.getObjects3DInt()) {
             BoundingBox bbox = obj.getBoundingBox();
             img.setSlice(bbox.zmin+1);
             ImageProcessor ip = img.getProcessor();
             ip.setFont(font);
+            ip.setColor(255);
             ip.drawString(String.valueOf((int)obj.getLabel()), bbox.xmin, bbox.ymin);
             img.updateAndDraw();
         }
