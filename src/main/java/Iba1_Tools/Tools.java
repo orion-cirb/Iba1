@@ -14,6 +14,7 @@ import ij.plugin.RGBStackMerge;
 import ij.plugin.ZProjector;
 import ij.plugin.filter.Analyzer;
 import ij.process.AutoThresholder;
+import ij.process.ImageProcessor;
 import java.awt.Color;
 import java.awt.Font;
 import java.io.File;
@@ -27,6 +28,7 @@ import loci.common.services.ServiceException;
 import loci.formats.FormatException;
 import loci.formats.meta.IMetadata;
 import loci.plugins.util.ImageProcessorReader;
+import mcib3d.geom2.BoundingBox;
 import mcib3d.geom2.Object3DInt;
 import mcib3d.geom2.Objects3DIntPopulation;
 import mcib3d.geom2.measurements.MeasureVolume;
@@ -297,11 +299,12 @@ public class Tools {
             fillImg(imgOut, rois);
         
         Objects3DIntPopulation pop = new Objects3DIntPopulation(ImageHandler.wrap(imgOut));
-        System.out.println("Nb objects detected:"+pop.getNbObjects());
+        System.out.println("Nb objects detected: "+pop.getNbObjects());
         popFilterZ(pop);
         popFilterSize(pop, minSomaVol, maxSomaVol);
         popFilterColoc(pop, obj);
         System.out.println("Nb objects remaining after filtering: "+ pop.getNbObjects());
+        pop.resetLabels();
         
         closeImage(img);
         closeImage(imgOut);
@@ -331,7 +334,6 @@ public class Tools {
      */
     public void popFilterZ(Objects3DIntPopulation pop) {
         pop.getObjects3DInt().removeIf(p -> (p.getObject3DPlanes().size() == 1));
-        pop.resetLabels();
     }
     
     
@@ -342,16 +344,17 @@ public class Tools {
         pop.setVoxelSizeXY(cal.pixelWidth);
         pop.setVoxelSizeZ(cal.pixelDepth);
         pop.getObjects3DInt().removeIf(p -> (new MeasureVolume(p).getVolumeUnit() < min) || (new MeasureVolume(p).getVolumeUnit() > max));
-        pop.resetLabels();
     }
     
     
+    /**
+     * Remove objects in population with less than 25% of their volume colocalizing with a given mask
+     */
     public void popFilterColoc(Objects3DIntPopulation somaPop, Object3DInt cellMask) {
         Objects3DIntPopulation cellPop = new Objects3DIntPopulation();
         cellPop.addObject(cellMask);
         MeasurePopulationColocalisation coloc = new MeasurePopulationColocalisation(somaPop, cellPop);
         somaPop.getObjects3DInt().removeIf(soma -> coloc.getValueObjectsPair(soma, cellMask) < 0.25*soma.size());
-        somaPop.resetLabels();
     }
     
     
@@ -368,7 +371,7 @@ public class Tools {
             fillImg(imgOut, rois);
         
         Objects3DIntPopulation pop = getPopFromImage(imgOut);
-        System.out.println("Nb objects detected:"+pop.getNbObjects());
+        System.out.println("Nb objects detected: "+pop.getNbObjects());
         popFilterSize(pop, minCellVol, Double.MAX_VALUE);
         System.out.println("Nb objects remaining after size filtering: "+ pop.getNbObjects());
         
@@ -496,14 +499,16 @@ public class Tools {
      */
     public void drawResults(Objects3DIntPopulation somaPop, Object3DInt cellObj, ImagePlus img,  String name) {
         ImageHandler imhSoma = ImageHandler.wrap(img).createSameDimensions();
+        ImagePlus imgLabels = IJ.createImage("", "8-bit black", img.getWidth(), img.getHeight(), img.getNSlices());
         ImageHandler imhCell = imhSoma.createSameDimensions();
         
         // Draw soma in red and cells in blue
         for(Object3DInt soma: somaPop.getObjects3DInt())
-            soma.drawObject(imhSoma); //, 255 TODO
+            soma.drawObject(imhSoma, 255);
+        drawLabels(somaPop, imgLabels);
         cellObj.drawObject(imhCell, 255);
 
-        ImagePlus[] imgColors = {imhSoma.getImagePlus(), null, imhCell.getImagePlus(), img};
+        ImagePlus[] imgColors = {imhSoma.getImagePlus(), null, imhCell.getImagePlus(), img, null, null, imgLabels};
         ImagePlus imgObjects = new RGBStackMerge().mergeHyperstacks(imgColors, false);
         imgObjects.setCalibration(cal);
         
@@ -514,4 +519,16 @@ public class Tools {
         imhCell.closeImagePlus();
     }
     
+
+    public void drawLabels(Objects3DIntPopulation pop, ImagePlus img) {
+        Font font = new Font("Monospace", Font.PLAIN, 14);
+        for (Object3DInt obj: pop.getObjects3DInt()) {
+            BoundingBox bbox = obj.getBoundingBox();
+            img.setSlice(bbox.zmin+1);
+            ImageProcessor ip = img.getProcessor();
+            ip.setFont(font);
+            ip.drawString(String.valueOf((int)obj.getLabel()), bbox.xmin, bbox.ymin);
+            img.updateAndDraw();
+        }
+    }
 }
