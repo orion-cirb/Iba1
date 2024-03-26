@@ -15,10 +15,10 @@ With each image can be provided a *.roi* or *.zip* file containing one or multip
 
 ### Plugin description
 
-* Detect microglia soma with Cellpose
-* Segment entire microglia with median filtering + thresholding
+* Detect microglial somas with Cellpose
+* Segment microglial cells with median filtering + thresholding
 * Compute background noise of Iba1 channel
-* Give soma number + microglia total volume + microglia background-corrected mean and integrated intensity
+* Give microglial somas number + microglial cells volume + microglial cells background-corrected mean and integrated intensity
 * If ROI(s) provided, remove from the analysis microglia that are inside
 
 ### Dependencies
@@ -29,4 +29,4 @@ With each image can be provided a *.roi* or *.zip* file containing one or multip
 
 ### Version history
 
-Version 1 released on March 25, 2024.
+Version 1 released on March 26, 2024.
